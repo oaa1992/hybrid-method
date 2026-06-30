@@ -1,0 +1,51 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOPC34YLscH9OY3Ny2fhG/9",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/oaa1992/hybrid-method/blob/main/Model%20Training%20Loop\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "u5KstygeF4fb"
+      },
+      "outputs": [],
+      "source": [
+        "history = hybrid_model.fit(\n",
+        "    x={'mri_image_input': X_train_img, 'bow_histogram_input': X_train_bow},\n",
+        "    y=Y_train,\n",
+        "    validation_data=(\n",
+        "        {'mri_image_input': X_val_img, 'bow_histogram_input': X_val_bow},\n",
+        "        Y_val\n",
+        "    ),\n",
+        "    batch_size=32,\n",
+        "    epochs=100,\n",
+        "    verbose=1\n",
+        ")"
+      ]
+    }
+  ]
+}
