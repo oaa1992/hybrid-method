@@ -1,0 +1,97 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMSk7CoKI0k1hORNecdFV9K",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/oaa1992/hybrid-method/blob/main/Hybrid%20CNN%20Architecture%20%26%20Fusion%20Layer\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "u5KstygeF4fb"
+      },
+      "outputs": [],
+      "source": [
+        "import tensorflow as tf\n",
+        "from tensorflow.keras import layers, models, optimizers\n",
+        "\n",
+        "def build_hybrid_bow_cnn_model():\n",
+        "    # Branch 1: CNN Image Input (512x512 Grayscale)\n",
+        "    input_image = layers.Input(shape=(512, 512, 1), name='mri_image_input')\n",
+        "\n",
+        "    x = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(input_image)\n",
+        "    x = layers.BatchNormalization()(x)\n",
+        "    x = layers.MaxPooling2D((2, 2))(x)\n",
+        "    x = layers.Dropout(0.25)(x)\n",
+        "\n",
+        "    x = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(x)\n",
+        "    x = layers.BatchNormalization()(x)\n",
+        "    x = layers.MaxPooling2D((2, 2))(x)\n",
+        "    x = layers.Dropout(0.25)(x)\n",
+        "\n",
+        "    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)\n",
+        "    x = layers.BatchNormalization()(x)\n",
+        "    x = layers.MaxPooling2D((2, 2))(x)\n",
+        "    x = layers.Dropout(0.25)(x)\n",
+        "\n",
+        "    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)\n",
+        "    x = layers.BatchNormalization()(x)\n",
+        "    x = layers.MaxPooling2D((2, 2))(x)\n",
+        "    x = layers.Dropout(0.25)(x)\n",
+        "\n",
+        "    x = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(x)\n",
+        "    x = layers.BatchNormalization()(x)\n",
+        "    x = layers.MaxPooling2D((2, 2))(x)\n",
+        "\n",
+        "    x = layers.Flatten()(x)\n",
+        "    f_cnn = layers.Dense(512, activation='relu', name='cnn_features')(x)\n",
+        "    f_cnn = layers.Dropout(0.5)(f_cnn)\n",
+        "\n",
+        "    # Branch 2: Local Spatial Features (1000-dimensional BOW)\n",
+        "    input_bow = layers.Input(shape=(1000,), name='bow_histogram_input')\n",
+        "\n",
+        "    # Adaptive Topographic-Semantic Fusion\n",
+        "    f_hybrid = layers.Concatenate(axis=-1, name='hybrid_fusion_layer')([input_bow, f_cnn])\n",
+        "\n",
+        "    # Multi-class Softmax Classifier\n",
+        "    output = layers.Dense(3, activation='softmax', name='tumor_class_prediction')(f_hybrid)\n",
+        "\n",
+        "    model = models.Model(inputs=[input_image, input_bow], outputs=output, name=\"Hybrid_BOW_CNN\")\n",
+        "\n",
+        "    return model\n",
+        "\n",
+        "hybrid_model = build_hybrid_bow_cnn_model()\n",
+        "\n",
+        "adam_optimizer = optimizers.Adam(learning_rate=0.001)\n",
+        "\n",
+        "hybrid_model.compile(optimizer=adam_optimizer,\n",
+        "                     loss='categorical_crossentropy',\n",
+        "                     metrics=['accuracy'])\n",
+        "\n",
+        "hybrid_model.summary()"
+      ]
+    }
+  ]
+}
